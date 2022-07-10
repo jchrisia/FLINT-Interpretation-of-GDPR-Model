@@ -287,6 +287,25 @@
     
 
 
+    <!-- http://www.metalex.eu/metalex/1.0/a42d4757_cfb5_4a5c_a46d_8417ff9dd75e -->
+
+    <owl:ObjectProperty rdf:about="http://www.metalex.eu/metalex/1.0/a42d4757_cfb5_4a5c_a46d_8417ff9dd75e">
+        <rdfs:subPropertyOf rdf:resource="http://www.metalex.eu/metalex/1.0/3a0f9209_9e51_4ad0_9dbf_71459e03b4c1"/>
+        <rdfs:domain rdf:resource="flint:669aa222_8d0d_4a5b_b3e3_b4e8f67f33a1"/>
+        <rdfs:range rdf:resource="http://www.metalex.eu/metalex/1.0/cb0a0e1c_f915_4d1a_97e1_e82f478b6157"/>
+        <rdfs:label xml:lang="en">NOT</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.metalex.eu/metalex/1.0/3a0f9209_9e51_4ad0_9dbf_71459e03b4c1 -->
+
+    <owl:ObjectProperty rdf:about="http://www.metalex.eu/metalex/1.0/3a0f9209_9e51_4ad0_9dbf_71459e03b4c1">
+        <rdfs:label xml:lang="en">BooleanExpression</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.metalex.eu/metalex/1.0/433e73f7_0905_490b_a595_2565bc864898 -->
 
     <owl:ObjectProperty rdf:about="http://www.metalex.eu/metalex/1.0/433e73f7_0905_490b_a595_2565bc864898">
@@ -300,6 +319,28 @@
         <rdfs:range rdf:resource="http://www.metalex.eu/metalex/1.0/cf797f12_9c47_4c59_82b3_439546f812f5"/>
         <rdfs:comment>Describes whether it is a Bibliographic Work or Bibliographic Expression</rdfs:comment>
         <rdfs:label xml:lang="en">isA</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.metalex.eu/metalex/1.0/5182eba9_829d_4f1b_a1a0_d2d8b8e16174 -->
+
+    <owl:ObjectProperty rdf:about="http://www.metalex.eu/metalex/1.0/5182eba9_829d_4f1b_a1a0_d2d8b8e16174">
+        <rdfs:subPropertyOf rdf:resource="http://www.metalex.eu/metalex/1.0/3a0f9209_9e51_4ad0_9dbf_71459e03b4c1"/>
+        <rdfs:domain rdf:resource="flint:669aa222_8d0d_4a5b_b3e3_b4e8f67f33a1"/>
+        <rdfs:range rdf:resource="http://www.metalex.eu/metalex/1.0/0c228799_5fdc_4d89_90bd_93197948695c"/>
+        <rdfs:label xml:lang="en">OR</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.metalex.eu/metalex/1.0/9e4a7973_dd90_416c_8531_aaaa57579cb3 -->
+
+    <owl:ObjectProperty rdf:about="http://www.metalex.eu/metalex/1.0/9e4a7973_dd90_416c_8531_aaaa57579cb3">
+        <rdfs:subPropertyOf rdf:resource="http://www.metalex.eu/metalex/1.0/3a0f9209_9e51_4ad0_9dbf_71459e03b4c1"/>
+        <rdfs:domain rdf:resource="flint:669aa222_8d0d_4a5b_b3e3_b4e8f67f33a1"/>
+        <rdfs:range rdf:resource="http://www.metalex.eu/metalex/1.0/8ba38da2_3695_4cf4_9ff3_3c19853b2dc8"/>
+        <rdfs:label xml:lang="en">AND</rdfs:label>
     </owl:ObjectProperty>
     
 
