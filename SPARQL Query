@@ -1,1 +1,430 @@
+# QUESTION 1. How do you check if the GDPR articles have been changed?
+# List the differences between current and new versions
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX gdprt: <https://w3id.org/GDPRtEXT#>
+PREFIX eli: <http://data.europa.eu/eli/>
+select ?GDPR_ARTICLE ?GDPR_CLASS (?gdpr_description as ?GDPR_TEXT) ?TAKE_EFFECT_ON ?EXPIRED_ON ?AUTHORITY ?NEW_GDPR_ARTICLE ?NEW_GDPR_CLASS  (?gdpr_version_description as ?NEW_GDPR_TEXT) ?VERS_TAKE_EFFECT_ON ?VERS_EXPIRED_ON ?VERS_AUTHORITY ?DIFFERENCE where { 
+	#Filter the entity GDPR that has a version.
+    ?entitygdpr dct:hasVersion ?entitygdprversion. #entity GDPR is linked to the new GDPR version
+    
+    #Entity GDPR information
+    ?entitygdpr rdfs:type ?GDPR_CLASS; #Entity GDPR has gdprt:Article class
+    			rdfs:label ?GDPR_ARTICLE; #Get the entity GDPR label
+     			rdfs:comment ?gdpr_description; #Get the entity GDPR text description
+     			flintgdpr:TakeEffectOn ?TAKE_EFFECT_ON; #Get the takes effect date of the entity GDPR
+     			flintgdpr:ExpiredOn ?EXPIRED_ON; #Get the expired date of the entity GDPR
+     			flintgdpr:Authority ?AUTHORITY. #Get the auhthority of the entity GDPR
+    
+    #Entity GDPR version information
+    ?entitygdprversion rdfs:type ?NEW_GDPR_CLASS; #Entity GDPR version has eli:version class
+    				   rdfs:label ?NEW_GDPR_ARTICLE; #Get a new GDPR article label
+    				   rdfs:comment ?gdpr_version_description; #Get the text description of the new GDPR article
+    				   flintgdpr:TakeEffectOn ?VERS_TAKE_EFFECT_ON; #Get the takes effect date of the entity GDPR
+    				   flintgdpr:ExpiredOn ?VERS_EXPIRED_ON; #Get the expired date of the entity GDPR
+    				   flintgdpr:Authority ?VERS_AUTHORITY. #Get the auhthority of the entity GDPR
+    
+    #Checking the differences between current and new GDPR sentences
+    ?entitygdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entityfragment. #entitygdpr linked to the FragmentSet and Fragment text
+    ?entityfragment calculemus:diff ?entitydifferenceset. #entityfragment linked to entitydifferenceset
+    ?entitydifferenceset rdfs:label ?DIFFERENCE. #get labels of the differences
+}
+
+
+# Question 2. How the existing facts, acts, and duty frames are affected by the new GDPR articles?
+# List the facts, acts, and duty frames that are linked to the GDPR articles that have versions.
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX gdprt: <https://w3id.org/GDPRtEXT#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?GDPR_ARTICLE ?FACT_FRAME ?ACT_COMPONENTS ?ACT_FRAME  where {
+    #Checking which GDPR has a version.   
+    ?entitygdpr dct:hasVersion ?entitygdprversion. #entity GDPR is linked to the new GDPR version
+    ?entitygdpr rdfs:type metalex:BibliographicWork.
+    ?entitygdpr rdfs:label ?GDPR_ARTICLE. #Get the GDPR article label
+    ?entitygdpr flintgdpr:createsFactFrame ?entity_fact. #Check the entity's facts that have linked to the entity GDPR. 
+    
+    #Get details of Fact frames
+    ?entity_fact rdfs:type ?ACT_COMPONENTS. #Get the label of fact type
+    ?entity_fact flintgdpr:TakeEffectOn ?FACT_TAKE_EFFECT.
+    FILTER(?FACT_TAKE_EFFECT = "2018-05-25"^^xsd:date)
+    
+    ?entity_fact rdfs:label ?FACT_FRAME. #Get the description of entity fact
+    ?entity_fact flintgdpr:partOfActFrame ?entity_act. #Check which act frames have linked to the entity fact
+    ?entity_act rdfs:label ?ACT_FRAME. #get the description of act
+    ?entity_act flintgdpr:TakeEffectOn ?ACT_TAKE_EFFECT.
+    FILTER(?ACT_TAKE_EFFECT = "2018-05-25"^^xsd:date)
+  
+    #There are no duties frames linked to the GDPR articles that have versions
+} 
+
+
+# Question 3. What are the new facts, acts, and duty frames created from the new GDPR version?
+# List new facts, acts and duty frames
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX gdprt: <https://w3id.org/GDPRtEXT#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX eli: <http://data.europa.eu/eli/>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?GDPR_ARTICLE ?FACT_FRAME ?ACT_COMPONENTS ?ACT_FRAME where{
+    #Checking the new GDPR article.        
+    ?entitynewgdpr rdfs:type metalex:BibliographicExpression; #new GDPR article has type new version
+    			  rdfs:label ?GDPR_ARTICLE; #get the entity gdpr label
+                  flintgdpr:createsFactFrame ?entity_fact.  #Check the entity's facts that have linked to the entity GDPR
+    
+    #Get details of Fact frames
+    ?entity_fact rdfs:type ?ACT_COMPONENTS. #Get the label of fact type
+    ?entity_fact flintgdpr:TakeEffectOn ?FACT_TAKE_EFFECT.
+    FILTER(?FACT_TAKE_EFFECT = "2022-06-17"^^xsd:date)
+    
+    ?entity_fact rdfs:label ?FACT_FRAME. #Get the description of entity fact
+    ?entity_fact flintgdpr:partOfActFrame ?entity_act. #Check which act frames have linked to the entity fact
+    ?entity_act rdfs:label ?ACT_FRAME. #get the description of act
+    ?entity_act flintgdpr:TakeEffectOn ?ACT_TAKE_EFFECT.
+    FILTER(?ACT_TAKE_EFFECT = "2022-06-17"^^xsd:date)
+  
+    #There are no duties frames linked to the GDPR articles that have versions
+
+} 
+
+#NEW ACT FRAMES COMPARISON:OVERVIEW ACTOR COMPONENTS
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX dcterms: <http://purl.org/dc/terms/> 
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select distinct ?ACT_FRAME ?ACTOR_FRAME ?ACTOR_FRAME_GDPR_ARTICLE ?CURRENT_FRAGMENT ?NEW_ACT_FRAME ?NEW_ACTOR_FRAME ?NEW_ACTOR_FRAME_GDOR_ARTICLE ?NEW_FRAGMENT ?DIFFERENCES where { 
+    #Get the ACT frame that is linked to a new ACT frame
+	?entityact rdfs:type flint:ActFrame. #Entity act has ACT frame type
+    ?entityact rdfs:label ?ACT_FRAME. #Get the label of the ACT frame
+    ?entityact flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    
+    
+    #Get the details of actor components
+    ?entityact flintgdpr:hasActor ?entityactor. #Entity act linked-to entity actor, which is fact frame
+    ?entityactor rdfs:label ?ACTOR_FRAME. #Get the description of an actor
+    ?entityactor flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entityactor flintgdpr:Source ?entitygdpr. #Entity actor linked to the entity GDPR
+    ?entitygdpr rdfs:label ?ACTOR_FRAME_GDPR_ARTICLE. #Get the label of entity GDPR
+  
+    
+    #Get the details of new actor components
+    ?entitynewact rdfs:label ?NEW_ACT_FRAME. #Get the label of the new act frame
+    ?entitynewact flintgdpr:hasActor ?entitynewactor. #Entity new act is linked to entity new actor, a fact frame
+    ?entitynewact flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewactor rdfs:label ?NEW_ACTOR_FRAME. #Get the description of the new actor
+    OPTIONAL{?entitynewactor flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.}
+    ?entitynewactor flintgdpr:Source ?entitynewversiongdpr. #Entity new actor is linked to a new GDPR version source
+    ?entitynewversiongdpr rdfs:label ?NEW_ACTOR_FRAME_GDOR_ARTICLE. #get the description of new GDPR
+    
+
+    # Get the details of the fragment set for actor components that have changed
+    # Since not all actor components have changed, we use optional
+    OPTIONAL{?entitygdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entityfragment. #Entity GDPR is linked to entity fragments
+             ?entityfragment rdfs:label ?CURRENT_FRAGMENT. #Get the label of the entity 
+             ?entitynewversiongdpr flintgdpr:hasFragmentSet ?entitynewfragmentset. #Entity new GDPR version is linked to the entity new fragment set
+             ?entitynewfragmentset flintgdpr:hasFragment ?entitynewfragment. #Entity fragment has a set of entity fragment set
+             ?entitynewfragment rdfs:label ?NEW_FRAGMENT. #Get the description of each fragment set
+        
+    #Get differences in text fragments
+    OPTIONAL{?entitynewfragment calculemus:diff/rdfs:label ?DIFFERENCES.}} #Use optional as not every fragment has differences
+ 
+}
+
+#NEW ACT FRAMES COMPARISON:OVERVIEW ACTION COMPONENTS
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX doco: <http://purl.org/spar/doco/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select distinct ?ACT_FRAME ?ACTION_FRAME ?ACTION_FRAME_GDPR_ARTICLE ?CURRENT_FRAGMENT ?NEW_ACT_FRAME ?NEW_ACTION_FRAME ?NEW_ACTION_FRAME_GDPR_ARTICLE ?NEW_FRAGMENT ?DIFFERENCES where { 
+     #Get the ACT frame that is linked to a new ACT frame
+	?entityact rdfs:type flint:ActFrame. #Entity act has ACT frame type
+    ?entityact rdfs:label ?ACT_FRAME. #Get the label of the ACT frame
+    ?entityact flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+ 
+    
+    #Get the details of action components
+    ?entityact flintgdpr:hasAction ?entityaction. #Entity act linked-to entity action, which is fact frame
+    ?entityaction rdfs:label ?ACTION_FRAME. #Get the description of an action
+    ?entityaction flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entityaction flintgdpr:Source ?entitygdpr. #Entity action linked to the entity GDPR
+    ?entitygdpr rdfs:label ?ACTION_FRAME_GDPR_ARTICLE. #Get the label of entity GDPR
+  
+    
+    #Get the details of new action components
+    ?entitynewact rdfs:label ?NEW_ACT_FRAME. #Get the label of the new act frame
+    ?entitynewact flintgdpr:hasAction ?entitynewaction. #Entity new act is linked to entity new action, a fact frame
+    ?entitynewact flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewaction rdfs:label ?NEW_ACTION_FRAME. #Get the description of the new action
+    ?entitynewaction flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewaction flintgdpr:Source ?entitynewversiongdpr. #Entity new action is linked to a new GDPR version source
+    ?entitynewversiongdpr rdfs:label ?NEW_ACTION_FRAME_GDPR_ARTICLE. #get the description of new gdpr
+    
+
+    # Get the details of the fragment set for action components that have changed
+    # Since not all action components have changed, we use optional
+    OPTIONAL{?entitygdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entityfragment. #Entity GDPR is linked to entity fragments
+             ?entityfragment rdfs:label ?CURRENT_FRAGMENT. #Get the label of the entity 
+             ?entitynewversiongdpr flintgdpr:hasFragmentSet ?entitynewfragmentset. #Entity new GDPR version is linked to the entity new fragment set
+             ?entitynewfragmentset flintgdpr:hasFragment ?entitynewfragment. #Entity fragment has a set of entity fragment set
+             ?entitynewfragment rdfs:label ?NEW_FRAGMENT. #Get the description of each fragment set
+        
+    #Get differences in text fragments
+    OPTIONAL{?entitynewfragment calculemus:diff/rdfs:label ?DIFFERENCES.}} #Use optional as not every fragment has differences
+
+}   
+
+#NEW ACT FRAMES COMPARISON:OVERVIEW RECIPIENT COMPONENTS
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX doco: <http://purl.org/spar/doco/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select distinct ?ACT_FRAME ?RECIPIENT_FRAME ?RECIPIENT_FRAME_GDPR_ARTICLE ?CURRENT_FRAGMENT ?NEW_ACT_FRAME ?NEW_RECIPIENT_FRAME ?NEW_RECIPIENT_FRAME_GDPR_ARTICLE ?NEW_FRAGMENT ?DIFFERENCES where { 
+     #Get the ACT frame that is linked to a new ACT frame
+	?entityact rdfs:type flint:ActFrame. #Entity act has ACT frame type
+    ?entityact rdfs:label ?ACT_FRAME. #Get the label of the ACT frame
+    ?entityact flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    
+    #Get the details of recipient components 
+    ?entityact flintgdpr:hasRecipient ?entityrecipient. #Entity act linked-to entity recipient, which is fact frame
+    ?entityrecipient rdfs:label ?RECIPIENT_FRAME. #Get the description of an recipient
+    ?entityrecipient flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entityrecipient flintgdpr:Source ?entitygdpr. #Entity action linked to the entity GDPR
+    ?entitygdpr rdfs:label ?ACTION_FRAME_GDPR_ARTICLE. #Get the label of entity GDPR
+    
+    
+    #Use optional because some entity recipient missing the GDPR source
+    OPTIONAL{?entityrecipient flintgdpr:Source ?entitygdpr. #entityrecipient linked to the entitygdpr
+             ?entitygdpr rdfs:label ?RECIPIENT_FRAME_GDPR_ARTICLE.    #get the description of entitygdpr
+        #use optional because some entity recipient don't have the fragments
+        OPTIONAL{?entitygdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entityfragment. #Entity GDPR is linked to entity fragments
+            ?entityfragment rdfs:label ?CURRENT_FRAGMENT.} #Get the label of the entity fragment
+  
+    
+    #Get the details of new recipient components
+    ?entitynewact rdfs:label ?NEW_ACT_FRAME. #Get the label of the new act frame
+    ?entitynewact flintgdpr:hasRecipient ?entitynewrecipient. #Entity new act is linked to entity new recipient, a fact frame
+    ?entitynewact flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewrecipient rdfs:label ?NEW_RECIPIENT_FRAME. #Get the description of the new recpient
+    ?entitynewrecipient flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    
+    #Use optional because some entity recipient missing the GDPR source
+    OPTIONAL{?entitynewrecipient flintgdpr:Source ?entitynewversiongdpr. #Entity new recipient is linked to a new GDPR version source
+             ?entitynewversiongdpr rdfs:label ?NEW_RECIPIENT_FRAME_GDPR_ARTICLE. #get the description of entity new GDPR
+       #use optional because some entity recipient don't have the fragments
+       OPTIONAL{?entitynewversiongdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entitynewfragment. #Entity new GDPR version is linked to the entity new fragment set
+                ?entitynewfragment rdfs:label ?NEW_FRAGMENT. #Get the description of each fragment set
+      
+             #Use optional as not every fragment has differences 
+            OPTIONAL{?entitynewfragment calculemus:diff/rdfs:label ?DIFFERENCES.}}} #get the description of new gdpr 
+   
+    }}
+#COMPARISON BETWEEN NEW ACT FRAMES:OVERVIEW PRECONDITIONS COMPONENTS
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX doco: <http://purl.org/spar/doco/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select distinct ?ACT_FRAME ?PRECONDITION_FRAME ?GDPR ?CURRENT_FRAGMENT ?NEW_ACT_FRAME ?NEW_PRECONDITION_FRAME ?NEW_GDPR ?NEW_FRAGMENT where { 
+    #Get the ACT frame that is linked to a new ACT frame
+	?entityact rdfs:type flint:ActFrame. #Entity act has ACT frame type
+    ?entityact rdfs:label ?ACT_FRAME. #Get the label of the ACT frame
+    ?entityact flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+
+    #Get the details of precondition set  
+    ?entityact flintgdpr:hasPreconditionSet ?entitypreconditionset. #entityact linked to entityperconditionset which is fact frame
+    ?entitypreconditionset flintgdpr:hasFactFrame ?entityprecondition. #entitypreconditionset linked to entityfact
+    ?entitypreconditionset flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entityprecondition rdfs:label ?PRECONDITION_FRAME. #get the label of precondition
+    ?entityprecondition flintgdpr:Source ?entitygdpr. #Entity precondition linked to the entity GDPR
+    ?entityprecondition flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entitygdpr rdfs:label ?GDPR. #get the description of entitygdpr
+        OPTIONAL{?entitygdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entityfragment. #Entity GDPR is linked to entity fragments
+                 ?entityfragment rdfs:label ?CURRENT_FRAGMENT.} #Get the label of the entity fragment
+    
+
+    #Get the details of new precondition set
+    ?entitynewact rdfs:label ?NEW_ACT_FRAME. #Get the label of the new act frame
+    ?entitynewact flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewact flintgdpr:hasPreconditionSet ?entitynewpreconditionset. #go to entitynewactor which is a fact frame
+    ?entitynewpreconditionset flintgdpr:hasFactFrame ?entitynewprecondition. #entitynewpreconditionset linked to entitynewfact
+    ?entitynewpreconditionset flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewprecondition rdfs:label ?NEW_PRECONDITION_FRAME. #get the label of new precondition
+    ?entitynewprecondition flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewprecondition flintgdpr:Source ?entitynewversiongdpr. #entity new precondition linked to the entity new version GDPR
+    ?entitynewversiongdpr rdfs:label ?NEW_GDPR. #get the description of new gdpr
+    OPTIONAL{?entitynewversiongdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entitynewfragment. #Entity new GDPR version is linked to the entity new fragment set
+        ?entitynewfragment rdfs:label ?NEW_FRAGMENT. #Get the description of each fragment set
+        
+           #Get differences in text fragments
+           OPTIONAL{?entitynewfragment calculemus:diff/rdfs:label ?DIFFERENCES.}} #Use optional as not every fragment has differences
+
+    # Get the details of the fragment set for precondition components that have changed
+    # Since not all precondition components have changed, we use optional
+
+ 
+
+
+}   
+
+#NEW ACT FRAMES COMPARISON:OVERVIEW OBJECT COMPONENTS
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select distinct ?ACT_FRAME ?OBJECT_FRAME ?OBJECT_CREATION_DATE ?OBJECT_FRAME_GDPR_ARTICLE ?CURRENT_FRAGMENT ?NEW_ACT_FRAME ?NEW_OBJECT_FRAME ?NEW_OBJECT_CREATION_DATE ?NEW_OBJECT_FRAME_GDPR_ARTICLE ?NEW_FRAGMENT ?DIFFERENCES where { 
+     #Get the ACT frame that is linked to a new ACT frame
+	?entityact rdfs:type flint:ActFrame. #Entity act has ACT frame type
+    ?entityact rdfs:label ?ACT_FRAME. #Get the label of the ACT frame
+    ?entityact flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+   
+    
+     #Get the details of object components 
+    ?entityact flintgdpr:hasObject ?entityobject. #Entity act linked-to entity object, which is fact frame
+    ?entityobject rdfs:label ?OBJECT_FRAME. #Get the description of an object
+    ?entityobject flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    
+    
+    #Use optional because some entity object missing the GDPR source
+    OPTIONAL{?entityobject flintgdpr:Source ?entitygdpr. #entityobject linked to the entitygdpr
+             ?entitygdpr rdfs:label ?OBJECT_FRAME_GDPR_ARTICLE. #get the label of entitygdpr
+                  #use optional because some entity object don't have the fragments
+             OPTIONAL{?entitygdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entityfragment. #Entity GDPR is linked to entity fragments
+                        ?entityfragment rdfs:label ?CURRENT_FRAGMENT.}} #Get the label of the entity fragment
+  
+    
+    #Get the details of new object components
+    ?entitynewact rdfs:label ?NEW_ACT_FRAME. #Get the label of the new act frame
+    ?entitynewact flintgdpr:hasObject ?entitynewobject. #Entity new act is linked to entity new object, a fact frame
+    ?entitynewact flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewobject rdfs:label ?NEW_OBJECT_FRAME. #Get the description of the new object
+    OPTIONAL{?entitynewobject flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.}
+    
+    #Use optional because some entity object missing the GDPR source
+    OPTIONAL{?entitynewobject flintgdpr:Source ?entitynewversiongdpr. #Entity new object is linked to a new GDPR version source
+            ?entitynewversiongdpr rdfs:label ?NEW_OBJECT_FRAME_GDPR_ARTICLE. #get the description of entity new GDPR
+      #use optional because some entity object don't have the fragments
+      OPTIONAL{?entitynewversiongdpr flintgdpr:hasFragmentSet/flintgdpr:hasFragment ?entitynewfragment. #Entity new GDPR version is linked to the entity new fragment set
+              ?entitynewfragment rdfs:label ?NEW_FRAGMENT. #Get the description of each fragment set
+            #Use optional as not every fragment has differences 
+            OPTIONAL{?entitynewfragment calculemus:diff/rdfs:label ?DIFFERENCES.}}} #get the description of new gdpr 
+    }
+#NEW ACT FRAMES COMPARISON:OVERVIEW ALL COMPONENTS
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX flint: <https://fin.triply.cc/ole/flint-model/model/def/>
+PREFIX dcterms: <http://purl.org/dc/terms/> 
+PREFIX calculemus: <https://fin.triply.cc/ole/calculemus/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX flintgdpr: <http://www.semanticweb.org/FLINTGDPR#>
+PREFIX metalex: <http://www.metalex.eu/metalex/1.0>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select distinct ?ACT ?ACTOR ?SOURCE_ACTOR ?ACTION ?SOURCE_ACTION ?RECIPIENT ?SOURCE_RECIPIENT ?OBJECT ?SOURCE_OBJECT ?NEW_ACT ?NEW_ACTOR ?SOURCE_NEW_ACTOR ?NEW_ACTION ?SOURCE_NEW_ACTION ?NEW_RECIPIENT ?SOURCE_NEW_RECIPIENT ?NEW_OBJECT ?SOURCE_NEW_OBJECT where { 
+    #Get the ACT frame that is linked to a new ACT frame
+	?entityact rdfs:type flint:ActFrame. #Entity act has ACT frame type
+    ?entityact rdfs:label ?ACT. #Get the label of the ACT frame
+    ?entityact flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    
+    #Get the details of actor components
+    ?entityact flintgdpr:hasActor ?entityactor. #Entity act linked-to entity actor, which is fact frame
+    ?entityactor rdfs:label ?ACTOR. #Get the description of an actor
+    ?entityactor flintgdpr:Source ?entitysourceactor. #Entity actor linked to the entity GDPR
+    ?entityactor flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entitysourceactor rdfs:label ?SOURCE_ACTOR. #Get the label of entity GDPR
+    
+    #Get the details of action components
+    ?entityact flintgdpr:hasAction ?entityaction. #Entity act linked-to entity action, which is fact frame
+    ?entityaction rdfs:label ?ACTION. #Get the description of an action
+    ?entityaction flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    ?entityaction flintgdpr:Source ?entitysourceaction. #Entity action linked to the entity GDPR
+    ?entitysourceaction rdfs:label ?SOURCE_ACTION. #Get the label of entity GDPR
+    
+    #Get the details of recipient components 
+    ?entityact flintgdpr:hasRecipient ?entityrecipient. #Entity act linked-to entity recipient, which is fact frame
+    ?entityrecipient rdfs:label ?RECIPIENT. #Get the description of an recipient
+    ?entityrecipient flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    #Use optional because some entity recipient missing the GDPR source
+    OPTIONAL{?entityrecipient flintgdpr:Source ?entitysourcerecipient. #entityrecipient linked to the entitygdpr
+             ?entitysourcerecipient rdfs:label ?SOURCE_RECIPIENT.}    #get the description of entitygdpr
+    
+    #Get the details of object components 
+    ?entityact flintgdpr:hasObject ?entityobject. #Entity act linked-to entity object, which is fact frame
+    ?entityobject rdfs:label ?OBJECT. #Get the description of an object
+    ?entityobject flintgdpr:TakeEffectOn "2018-05-25"^^xsd:date.
+    #Use optional because some entity object missing the GDPR source
+    OPTIONAL{?entityobject flintgdpr:Source ?entitysourceobject. #entityobject linked to the entitygdpr
+             ?entitysourceobject rdfs:label ?SOURCE_OBJECT.} #get the label of entitygdpr
+    
+  
+    
+    #Get the details of new actor components
+    ?entitynewact rdfs:label ?NEW_ACT. #Get the label of the new act frame
+    ?entitynewact flintgdpr:hasActor ?entitynewactor. #Entity new act is linked to entity new actor, a fact frame
+    ?entitynewact flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewactor rdfs:label ?NEW_ACTOR. #Get the description of the new actor
+    OPTIONAL{ ?entitynewactor flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.}
+    ?entitynewactor flintgdpr:Source ?entitynewsourceactor. #Entity new actor is linked to a new GDPR version source
+    ?entitynewsourceactor rdfs:label ?SOURCE_NEW_ACTOR. #get the description of new GDPR
+    
+    #Get the details of new action components
+    ?entitynewact flintgdpr:hasAction ?entitynewaction. #Entity new act is linked to entity new action, a fact frame
+    ?entitynewaction rdfs:label ?NEW_ACTION. #Get the description of the new action
+    ?entitynewaction flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    ?entitynewaction flintgdpr:Source ?entitynewsourceaction. #Entity new action is linked to a new GDPR version source
+    ?entitynewsourceaction rdfs:label ?SOURCE_NEW_ACTION. #get the description of new gdpr
+    
+    #Get the details of new recipient components
+    ?entitynewact flintgdpr:hasRecipient ?entitynewrecipient. #Entity new act is linked to entity new recipient, a fact frame
+    ?entitynewrecipient rdfs:label ?NEW_RECIPIENT. #Get the description of the new recpient
+    ?entitynewrecipient flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.
+    #Use optional because some entity recipient missing the GDPR source
+    OPTIONAL{?entitynewrecipient flintgdpr:Source ?entitynewsourcerecipient. #Entity new recipient is linked to a new GDPR version source
+             ?entitynewsourcerecipient rdfs:label ?SOURCE_NEW_RECIPIENT.} #get the description of entity new GDPR
+    
+    #Get the details of new object components
+    ?entitynewact flintgdpr:hasObject ?entitynewobject. #Entity new act is linked to entity new object, a fact frame
+    ?entitynewobject rdfs:label ?NEW_OBJECT. #Get the description of the new object
+    OPTIONAL{?entitynewobject flintgdpr:TakeEffectOn "2022-06-17"^^xsd:date.}
+    #Use optional because some entity object missing the GDPR source
+    OPTIONAL{?entitynewobject flintgdpr:Source ?entitynewsourceobject. #Entity new object is linked to a new GDPR version source
+             ?entitynewsourceobject rdfs:label ?SOURCE_NEW_OBJECT.} #get the description of entity new GDPR
+    
+    
+ 
+}
 
