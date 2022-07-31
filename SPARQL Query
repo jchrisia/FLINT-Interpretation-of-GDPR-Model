@@ -424,7 +424,7 @@ select distinct ?ACT ?ACTOR ?SOURCE_ACTOR ?ACTION ?SOURCE_ACTION ?RECIPIENT ?SOU
     OPTIONAL{?entitynewobject flintgdpr:Source ?entitynewsourceobject. #Entity new object is linked to a new GDPR version source
              ?entitynewsourceobject rdfs:label ?SOURCE_NEW_OBJECT.} #get the description of entity new GDPR
     
-    
+  
  
 }
 
